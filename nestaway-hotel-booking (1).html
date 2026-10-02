@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nestaway — Find Your Perfect Stay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --purple: #9B87C9;
+    --purple-deep: #6E5A9E;
+    --purple-tint: #E9E3F7;
+    --amber: #E8A33D;
+    --gold: #D4AF6A;
+    --bg: #FFFDF8;
+    --cream: #F6EEE1;
+    --cream-deep: #EFE2CC;
+    --text: #1F2937;
+    --text-soft: #6B7280;
+    --white: #FFFFFF;
+    --shadow-soft: 0 10px 30px rgba(110, 90, 158, 0.12);
+    --shadow-deep: 0 20px 50px rgba(110, 90, 158, 0.22);
+    --radius: 22px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Inter', sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{font-family:'Poppins',sans-serif;}
+  .data-label,.mono{font-family:'Roboto',sans-serif;}
+  a{text-decoration:none;color:inherit;}
+  ul{list-style:none;}
+  img{display:block;max-width:100%;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+
+  ::selection{background:var(--gold); color:#fff;}
+
+  /* ---------- reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+  }
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible{
+    outline:2px solid var(--purple-deep);
+    outline-offset:3px;
+    border-radius:6px;
+  }
+
+  /* ================= VIEW SWITCH SYSTEM ================= */
+  .view{display:none;}
+  .view.active{display:block; animation:viewFade .5s ease;}
+  @keyframes viewFade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+
+  /* ================= DEV NAV (page switcher for prototype) ================= */
+  .proto-switch{
+    position:fixed; bottom:22px; right:22px; z-index:999;
+    background:rgba(255,255,255,0.85); backdrop-filter:blur(14px);
+    border:1px solid rgba(155,135,201,0.3);
+    border-radius:100px; padding:6px; display:flex; gap:4px;
+    box-shadow:var(--shadow-deep);
+  }
+  .proto-switch button{
+    font-size:12.5px; font-weight:600; padding:9px 16px; border-radius:100px;
+    color:var(--purple-deep); transition:all .25s ease;
+    font-family:'Inter',sans-serif;
+  }
+  .proto-switch button.active{background:var(--purple-deep); color:#fff;}
+  .proto-switch button:not(.active):hover{background:var(--purple-tint);}
+
+  /* ================= HEADER ================= */
+  header{
+    position:sticky; top:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 56px;
+    background:rgba(255,253,248,0.78);
+    backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(155,135,201,0.14);
+  }
+  .logo{display:flex; align-items:center; gap:10px; font-size:21px; font-weight:700; color:var(--purple-deep);}
+  .logo svg{width:38px; height:38px;}
+  .wing{transform-origin: 19px 22px; animation:flap 2.6s ease-in-out infinite;}
+  @keyframes flap{
+    0%,100%{transform:rotate(0deg) scaleY(1);}
+    50%{transform:rotate(-14deg) scaleY(0.92);}
+  }
+  nav.main-nav ul{display:flex; gap:38px;}
+  nav.main-nav a{
+    font-size:15px; font-weight:500; color:var(--text); position:relative; padding-bottom:4px;
+    transition:color .25s ease;
+  }
+  nav.main-nav a::after{
+    content:''; position:absolute; left:0; bottom:0; width:0; height:2px;
+    background:var(--amber); transition:width .3s ease;
+  }
+  nav.main-nav a:hover{color:var(--purple-deep);}
+  nav.main-nav a:hover::after, nav.main-nav a.current::after{width:100%;}
+  nav.main-nav a.current{color:var(--purple-deep); font-weight:600;}
+  .auth-btns{display:flex; gap:12px; align-items:center;}
+  .btn-ghost{
+    padding:10px 22px; border-radius:100px; font-weight:600; font-size:14px;
+    border:1.5px solid var(--purple); color:var(--purple-deep);
+    transition:all .3s ease;
+  }
+  .btn-ghost:hover{box-shadow:0 0 0 6px rgba(155,135,201,0.16); background:var(--purple-tint);}
+  .btn-solid{
+    padding:10.5px 24px; border-radius:100px; font-weight:600; font-size:14px; color:#fff;
+    background:linear-gradient(135deg, var(--purple-deep), var(--purple));
+    transition:all .3s ease; box-shadow:0 6px 18px rgba(110,90,158,0.28);
+  }
+  .btn-solid:hover{box-shadow:0 0 0 8px rgba(232,163,61,0.18), 0 8px 20px rgba(110,90,158,0.32); transform:translateY(-1px);}
+
+  /* ================= HERO ================= */
+  .hero{
+    position:relative; height:92vh; min-height:640px; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .hero-bg{
+    position:absolute; inset:0; width:100%; height:120%;
+    background-image:url('https://images.unsplash.com/photo-1573052905904-34ad8c27f0cc?auto=format&fit=crop&w=1900&q=80');
+    background-size:cover; background-position:center;
+    will-change:transform;
+  }
+  .hero-bg::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(60,40,90,0.25) 0%, rgba(45,30,70,0.15) 45%, rgba(255,253,248,0.96) 100%);
+  }
+  .hero-content{position:relative; z-index:2; text-align:center; padding:0 20px; max-width:900px;}
+  .hero-content h1{
+    font-size:clamp(38px, 6vw, 68px); font-weight:700; color:#fff;
+    text-shadow:0 4px 30px rgba(60,40,90,0.35);
+    letter-spacing:-0.5px;
+    opacity:0; transform:translateY(24px);
+    animation:heroFade 1.1s ease .2s forwards;
+  }
+  .hero-content .accent-word{color:#F3E9FF; font-style:italic; font-weight:600;}
+  .hero-content p{
+    margin-top:16px; font-size:18px; color:#fff; opacity:0; font-weight:400;
+    text-shadow:0 2px 14px rgba(60,40,90,0.4);
+    animation:heroFade 1.1s ease .45s forwards;
+  }
+  @keyframes heroFade{to{opacity:1; transform:translateY(0);}}
+
+  .search-bar{
+    margin-top:44px; background:rgba(255,255,255,0.92); backdrop-filter:blur(20px);
+    border-radius:20px; padding:22px; display:flex; gap:14px; align-items:flex-end;
+    box-shadow:var(--shadow-deep); opacity:0; transform:translateY(20px);
+    animation:heroFade 1s ease .7s forwards;
+    border:1px solid rgba(255,255,255,0.5);
+  }
+  .field{display:flex; flex-direction:column; gap:7px; flex:1; text-align:left; position:relative;}
+  .field label{font-size:12px; font-weight:600; color:var(--purple-deep); letter-spacing:0.3px;}
+  .field .input-wrap{
+    display:flex; align-items:center; gap:8px; background:var(--cream); border-radius:12px;
+    padding:11px 14px; border:1.5px solid transparent; transition:all .3s ease;
+  }
+  .field .input-wrap:focus-within{
+    border-color:var(--purple); background:#fff; transform:translateY(-3px);
+    box-shadow:0 8px 18px rgba(155,135,201,0.22);
+  }
+  .field input, .field select{
+    border:none; background:none; outline:none; font-size:14px; color:var(--text); width:100%; font-family:'Inter',sans-serif;
+  }
+  .field svg{flex-shrink:0; opacity:0.65;}
+  .btn-search{
+    padding:13.5px 34px; border-radius:12px; background:linear-gradient(135deg, var(--gold), var(--amber));
+    color:#4A2E00; font-weight:700; font-size:14.5px; white-space:nowrap;
+    box-shadow:0 8px 22px rgba(212,175,106,0.4); transition:all .25s ease;
+    position:relative; overflow:hidden;
+  }
+  .btn-search:hover{transform:translateY(-2px); box-shadow:0 12px 28px rgba(212,175,106,0.5);}
+
+  /* ================= SECTION GENERICS ================= */
+  section{padding:88px 56px;}
+  .section-head{text-align:center; max-width:640px; margin:0 auto 48px;}
+  .eyebrow{
+    font-size:12.5px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+    color:var(--amber); display:block; margin-bottom:10px;
+  }
+  .section-head h2{font-size:clamp(28px,3.5vw,40px); font-weight:600; color:var(--purple-deep);}
+  .section-head p{margin-top:12px; color:var(--text-soft); font-size:15.5px; line-height:1.6;}
+
+  .reveal{opacity:0; transform:translateY(32px); transition:all .8s cubic-bezier(.2,.7,.3,1);}
+  .reveal.in{opacity:1; transform:translateY(0);}
+  .reveal-left{opacity:0; transform:translateX(-46px); transition:all .8s cubic-bezier(.2,.7,.3,1);}
+  .reveal-left.in{opacity:1; transform:translateX(0);}
+  .reveal-right{opacity:0; transform:translateX(46px); transition:all .8s cubic-bezier(.2,.7,.3,1);}
+  .reveal-right.in{opacity:1; transform:translateX(0);}
+
+  /* ================= CATEGORIES ================= */
+  .category-grid{
+    display:grid; grid-template-columns:repeat(5,1fr); gap:20px; max-width:1280px; margin:0 auto;
+  }
+  .cat-card{
+    position:relative; height:150px; border-radius:18px; overflow:hidden; cursor:pointer;
+    box-shadow:var(--shadow-soft); transition:transform .4s cubic-bezier(.2,.8,.3,1), box-shadow .4s ease;
+  }
+  .cat-card:hover{transform:translateY(-8px) scale(1.02); box-shadow:var(--shadow-deep);}
+  .cat-card img{width:100%; height:100%; object-fit:cover; transition:transform .6s ease;}
+  .cat-card:hover img{transform:scale(1.12);}
+  .cat-card::before{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(30,20,50,0.05) 30%, rgba(30,20,50,0.75) 100%);
+  }
+  .cat-card .cat-label{
+    position:absolute; bottom:14px; left:14px; right:14px; color:#fff; font-weight:600; font-size:14.5px;
+    display:flex; align-items:center; gap:8px; z-index:2;
+  }
+  .cat-card .cat-label svg{transition:transform .5s ease;}
+  .cat-card:hover .cat-label svg{animation:shimmer 1s ease;}
+  @keyframes shimmer{
+    0%{transform:scale(1) rotate(0);}
+    30%{transform:scale(1.3) rotate(-8deg); filter:drop-shadow(0 0 8px rgba(255,255,255,0.9));}
+    100%{transform:scale(1) rotate(0);}
+  }
+
+  /* ================= FEATURED HOTELS ================= */
+  .hotel-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:26px; max-width:1280px; margin:0 auto;
+  }
+  .hotel-card{
+    background:var(--white); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-soft);
+    transition:transform .4s ease, box-shadow .4s ease; border:1px solid rgba(155,135,201,0.08);
+  }
+  .hotel-card:hover{transform:translateY(-10px); box-shadow:var(--shadow-deep);}
+  .hotel-img-wrap{height:180px; overflow:hidden; position:relative;}
+  .hotel-img-wrap img{width:100%; height:100%; object-fit:cover; transition:transform .7s cubic-bezier(.2,.8,.3,1);}
+  .hotel-card:hover .hotel-img-wrap img{transform:scale(1.14);}
+  .hotel-tag{
+    position:absolute; top:12px; left:12px; background:rgba(255,255,255,0.92); backdrop-filter:blur(6px);
+    padding:5px 12px; border-radius:100px; font-size:11.5px; font-weight:700; color:var(--purple-deep);
+  }
+  .hotel-body{padding:18px 20px 20px;}
+  .hotel-body h3{font-size:16.5px; font-weight:600; margin-bottom:4px;}
+  .hotel-loc{display:flex; align-items:center; gap:5px; font-size:12.5px; color:var(--text-soft); margin-bottom:8px;}
+  .stars{display:flex; gap:2px; margin-bottom:10px;}
+  .stars svg{width:14px; height:14px; fill:var(--gold); opacity:0; animation:starPop .4s ease forwards;}
+  .stars svg:nth-child(1){animation-delay:.1s;} .stars svg:nth-child(2){animation-delay:.2s;}
+  .stars svg:nth-child(3){animation-delay:.3s;} .stars svg:nth-child(4){animation-delay:.4s;}
+  .stars svg:nth-child(5){animation-delay:.5s;}
+  @keyframes starPop{0%{opacity:0; transform:scale(0) rotate(-40deg);} 60%{opacity:1; transform:scale(1.3) rotate(8deg);} 100%{opacity:1; transform:scale(1) rotate(0);}}
+  .amenities{display:flex; gap:10px; margin-bottom:14px;}
+  .amenities span{display:flex; align-items:center; gap:4px; font-size:11.5px; color:var(--text-soft);}
+  .amenities svg{width:14px; height:14px; opacity:0.7;}
+  .hotel-foot{display:flex; align-items:center; justify-content:space-between;}
+  .price{font-size:17px; font-weight:700; color:var(--purple-deep);}
+  .price span{font-size:11.5px; font-weight:400; color:var(--text-soft);}
+  .btn-book{
+    padding:9px 18px; border-radius:100px; background:var(--purple-deep); color:#fff; font-size:13px; font-weight:600;
+    transition:all .3s ease;
+  }
+  .btn-book:hover{background:var(--purple); box-shadow:0 6px 16px rgba(155,135,201,0.4); transform:translateY(-2px);}
+
+  /* ================= DESTINATIONS ================= */
+  .dest-scroll{display:grid; grid-template-columns:repeat(5,1fr); gap:20px; max-width:1280px; margin:0 auto;}
+  .dest-card{
+    position:relative; border-radius:18px; overflow:hidden; height:230px; cursor:pointer;
+    box-shadow:var(--shadow-soft);
+  }
+  .dest-card img{width:100%; height:100%; object-fit:cover; transition:transform .6s ease;}
+  .dest-card:hover img{transform:scale(1.1);}
+  .dest-card::after{content:''; position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(20,15,35,0.8) 100%);}
+  .dest-card span{position:absolute; bottom:16px; left:16px; color:#fff; font-weight:600; font-size:16px; z-index:2;}
+
+  /* ================= OFFERS ================= */
+  .offer-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:22px; max-width:1280px; margin:0 auto;}
+  .offer-card{
+    border-radius:20px; padding:26px; position:relative; overflow:hidden;
+    display:flex; flex-direction:column; gap:14px; min-height:150px; justify-content:center;
+    transition:transform .35s ease;
+  }
+  .offer-card:hover{transform:translateY(-6px);}
+  .offer-card:nth-child(1){background:linear-gradient(135deg,#E9E3F7,#D4C4F0);}
+  .offer-card:nth-child(2){background:linear-gradient(135deg,#FCEBD2,#F6D49C);}
+  .offer-card:nth-child(3){background:linear-gradient(135deg,#F6EEE1,#E8D9BE);}
+  .offer-card:nth-child(4){background:linear-gradient(135deg,#EFE0EE,#DDC2E0);}
+  .offer-badge{
+    width:48px; height:48px; border-radius:14px; background:rgba(255,255,255,0.7); display:flex; align-items:center; justify-content:center;
+    animation:pulseBadge 2.6s ease-in-out infinite;
+  }
+  @keyframes pulseBadge{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0.7);} 50%{box-shadow:0 0 0 10px rgba(255,255,255,0);}}
+  .offer-card h4{font-size:16px; font-weight:700; color:var(--text);}
+  .offer-card p{font-size:12.5px; color:var(--text-soft);}
+
+  /* ================= WHY CHOOSE US ================= */
+  .why-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:22px; max-width:1280px; margin:0 auto;}
+  .why-card{text-align:center; padding:30px 20px;}
+  .why-icon{
+    width:70px; height:70px; border-radius:50%; background:var(--purple-tint); display:flex; align-items:center; justify-content:center;
+    margin:0 auto 16px; transition:transform .5s cubic-bezier(.34,1.56,.64,1);
+  }
+  .why-card:hover .why-icon{transform:rotate(12deg) scale(1.08);}
+  .why-icon svg{width:30px; height:30px; stroke:var(--purple-deep);}
+  .why-card h4{font-size:15.5px; font-weight:600; margin-bottom:6px;}
+  .why-card p{font-size:12.5px; color:var(--text-soft);}
+
+  /* ================= FOOTER ================= */
+  footer{background:var(--purple-deep); color:#EFE9FA; padding:60px 56px 26px;}
+  .footer-grid{display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:40px; max-width:1280px; margin:0 auto 40px;}
+  .footer-grid h5{font-size:14px; font-weight:600; margin-bottom:16px; color:#fff;}
+  .footer-grid ul li{margin-bottom:10px; font-size:13.5px; opacity:0.8;}
+  .footer-grid ul li a:hover{opacity:1; text-decoration:underline;}
+  .footer-logo{display:flex; align-items:center; gap:8px; font-size:19px; font-weight:700; color:#fff; margin-bottom:12px;}
+  .footer-bottom{
+    max-width:1280px; margin:0 auto; padding-top:22px; border-top:1px solid rgba(255,255,255,0.15);
+    display:flex; justify-content:space-between; align-items:center; font-size:12.5px; opacity:0.75;
+  }
+  .social-row{display:flex; gap:12px;}
+  .social-row a{width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; transition:all .3s ease;}
+  .social-row a:hover{background:var(--gold);}
+
+  /* ============================================================
+     BOOKING DETAILS PAGE
+  ============================================================ */
+  .booking-hero{padding:32px 56px 0;}
+  .breadcrumb{font-size:13px; color:var(--text-soft); margin-bottom:20px;}
+  .breadcrumb b{color:var(--purple-deep);}
+  .gallery{
+    display:grid; grid-template-columns:1.6fr 1fr; gap:12px; height:420px; border-radius:20px; overflow:hidden;
+  }
+  .gallery-main{position:relative; overflow:hidden;}
+  .gallery-main img{width:100%; height:100%; object-fit:cover; animation:galleryFade 6s ease infinite;}
+  @keyframes galleryFade{0%,45%{opacity:1;} 50%{opacity:0.85;} 100%{opacity:1;}}
+  .gallery-side{display:grid; grid-template-rows:1fr 1fr; gap:12px;}
+  .gallery-side div{overflow:hidden; border-radius:14px; position:relative; cursor:pointer;}
+  .gallery-side img{width:100%; height:100%; object-fit:cover; transition:transform .5s ease;}
+  .gallery-side div:hover img{transform:scale(1.08);}
+  .gallery-side .more-overlay{position:absolute; inset:0; background:rgba(30,20,50,0.55); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:15px;}
+
+  .booking-layout{
+    display:grid; grid-template-columns:1.55fr 1fr; gap:36px; padding:40px 56px 100px; max-width:1400px; margin:0 auto;
+  }
+  .hotel-info-block h1{font-size:30px; font-weight:600; color:var(--text); margin-bottom:8px;}
+  .hotel-meta{display:flex; align-items:center; gap:16px; margin-bottom:6px; flex-wrap:wrap;}
+  .rating-pill{display:flex; align-items:center; gap:5px; background:var(--purple-tint); padding:5px 12px; border-radius:100px; font-size:13px; font-weight:600; color:var(--purple-deep);}
+  .rating-pill svg{width:14px; height:14px; fill:var(--gold);}
+  .loc-line{display:flex; align-items:center; gap:6px; font-size:13.5px; color:var(--text-soft);}
+  .hotel-desc{margin:18px 0 28px; color:var(--text-soft); font-size:14.5px; line-height:1.75; max-width:640px;}
+
+  .amenity-strip{display:flex; gap:26px; flex-wrap:wrap; padding:22px 0; border-top:1px solid rgba(155,135,201,0.15); border-bottom:1px solid rgba(155,135,201,0.15); margin-bottom:32px;}
+  .amenity-strip div{display:flex; flex-direction:column; align-items:center; gap:8px; font-size:12px; color:var(--text-soft); width:76px; text-align:center;}
+  .amenity-strip svg{width:24px; height:24px; stroke:var(--purple-deep);}
+
+  .form-card{
+    background:var(--white); border-radius:var(--radius); padding:30px; box-shadow:var(--shadow-soft);
+    border:1px solid rgba(155,135,201,0.1); margin-bottom:24px;
+  }
+  .form-card h3{font-size:18px; font-weight:600; margin-bottom:20px; color:var(--purple-deep);}
+  .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .form-group{display:flex; flex-direction:column; gap:7px; position:relative;}
+  .form-group.full{grid-column:1/-1;}
+  .form-group label{font-size:12.5px; font-weight:600; color:var(--text); letter-spacing:0.2px;}
+  .form-group input, .form-group select{
+    padding:13px 15px; border-radius:12px; border:1.5px solid #E7E1F2; background:var(--cream);
+    font-size:14px; outline:none; transition:all .3s cubic-bezier(.2,.8,.3,1); font-family:'Inter',sans-serif;
+  }
+  .form-group input:focus, .form-group select:focus{
+    border-color:var(--purple); background:#fff; transform:translateY(-3px);
+    box-shadow:0 10px 22px rgba(155,135,201,0.22);
+  }
+
+  .payment-methods{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+  .pay-opt{
+    border:1.5px solid #E7E1F2; border-radius:14px; padding:16px 10px; text-align:center; cursor:pointer;
+    transition:all .25s ease; display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+  .pay-opt svg{width:22px; height:22px; stroke:var(--purple-deep);}
+  .pay-opt span{font-size:12px; font-weight:600; color:var(--text-soft);}
+  .pay-opt:hover{border-color:var(--purple); background:var(--purple-tint);}
+  .pay-opt.selected{border-color:var(--purple-deep); background:var(--purple-tint); box-shadow:0 0 0 3px rgba(155,135,201,0.22);}
+  .pay-opt.selected span{color:var(--purple-deep);}
+
+  /* summary sidebar - glassmorphism */
+  .summary-box{
+    position:sticky; top:100px;
+    background:linear-gradient(160deg, rgba(255,255,255,0.75), rgba(233,227,247,0.55));
+    backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+    border:1px solid rgba(255,255,255,0.6);
+    border-radius:var(--radius); padding:28px; box-shadow:var(--shadow-deep);
+  }
+  .summary-hotel{display:flex; gap:14px; margin-bottom:20px; padding-bottom:20px; border-bottom:1px dashed rgba(155,135,201,0.35);}
+  .summary-hotel img{width:78px; height:78px; border-radius:14px; object-fit:cover;}
+  .summary-hotel h4{font-size:15px; font-weight:600; margin-bottom:4px;}
+  .summary-hotel p{font-size:12px; color:var(--text-soft);}
+  .summary-row{display:flex; justify-content:space-between; font-size:13.5px; color:var(--text-soft); margin-bottom:12px;}
+  .summary-row b{color:var(--text); font-weight:600;}
+  .summary-total{
+    display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding-top:16px;
+    border-top:1.5px solid rgba(155,135,201,0.25); font-size:16px; font-weight:700; color:var(--purple-deep);
+  }
+  .summary-total span:last-child{font-size:22px;}
+
+  .btn-confirm{
+    width:100%; margin-top:22px; padding:16px; border-radius:14px; text-align:center;
+    background:linear-gradient(135deg, var(--purple-deep), var(--purple)); color:#fff; font-weight:700; font-size:15px;
+    position:relative; overflow:hidden; box-shadow:0 10px 26px rgba(110,90,158,0.35); transition:transform .25s ease;
+  }
+  .btn-confirm:hover{transform:translateY(-2px);}
+  .ripple{position:absolute; border-radius:50%; background:rgba(255,255,255,0.55); transform:scale(0); animation:rippleAnim .6s ease-out; pointer-events:none;}
+  @keyframes rippleAnim{to{transform:scale(3.2); opacity:0;}}
+
+  /* ============================================================
+     CONFIRMATION PAGE
+  ============================================================ */
+  .confirm-wrap{
+    min-height:88vh; display:flex; align-items:center; justify-content:center; padding:60px 20px;
+    background:radial-gradient(circle at 50% 0%, #F3EEFB 0%, var(--bg) 60%);
+  }
+  .confirm-card{
+    max-width:640px; width:100%; background:var(--white); border-radius:28px; padding:56px 48px;
+    box-shadow:var(--shadow-deep); text-align:center; border:1px solid rgba(155,135,201,0.1);
+  }
+  .check-circle{
+    width:104px; height:104px; border-radius:50%; background:linear-gradient(135deg,#7FD9A0,#4FBF7C);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 26px;
+    animation:bounceIn .8s cubic-bezier(.34,1.56,.64,1);
+    box-shadow:0 14px 30px rgba(79,191,124,0.35);
+  }
+  @keyframes bounceIn{
+    0%{transform:scale(0); opacity:0;}
+    55%{transform:scale(1.15); opacity:1;}
+    75%{transform:scale(0.92);}
+    100%{transform:scale(1);}
+  }
+  .check-circle svg{width:52px; height:52px; stroke:#fff; stroke-width:3;
+    stroke-dasharray:40; stroke-dashoffset:40; animation:drawCheck .5s ease .5s forwards;}
+  @keyframes drawCheck{to{stroke-dashoffset:0;}}
+  .confirm-card h1{
+    font-size:28px; font-weight:700; color:var(--text); margin-bottom:10px;
+    opacity:0; animation:heroFade .8s ease .3s forwards;
+  }
+  .confirm-card > p.sub{
+    color:var(--text-soft); font-size:14.5px; margin-bottom:32px;
+    opacity:0; animation:heroFade .8s ease .45s forwards;
+  }
+  .confirm-details{
+    background:var(--cream); border-radius:18px; padding:26px; text-align:left; margin-bottom:28px;
+  }
+  .cd-row{display:flex; justify-content:space-between; padding:10px 0; font-size:13.5px; border-bottom:1px solid rgba(155,135,201,0.14);}
+  .cd-row:last-child{border-bottom:none;}
+  .cd-row span:first-child{color:var(--text-soft);}
+  .cd-row span:last-child{font-weight:600; color:var(--text);}
+  .status-paid{color:#3F9E67 !important; display:inline-flex; align-items:center; gap:5px;}
+  .status-paid::before{content:''; width:7px; height:7px; border-radius:50%; background:#3F9E67; display:inline-block;}
+
+  .confirm-actions{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .conf-btn{
+    padding:14px; border-radius:13px; font-weight:600; font-size:13.5px; display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:all .3s ease;
+  }
+  .conf-btn svg{width:16px; height:16px;}
+  .conf-btn.primary{background:linear-gradient(135deg, var(--purple-deep), var(--purple)); color:#fff; box-shadow:0 8px 20px rgba(110,90,158,0.3);}
+  .conf-btn.primary:hover{box-shadow:0 0 0 6px rgba(155,135,201,0.2); transform:translateY(-2px);}
+  .conf-btn.outline{border:1.5px solid #E2DAF2; color:var(--purple-deep); background:#fff;}
+  .conf-btn.outline:hover{background:var(--purple-tint); box-shadow:0 0 0 6px rgba(155,135,201,0.12);}
+
+  /* ================= RESPONSIVE ================= */
+  @media (max-width: 1100px){
+    .category-grid{grid-template-columns:repeat(3,1fr);}
+    .hotel-grid{grid-template-columns:repeat(2,1fr);}
+    .dest-scroll{grid-template-columns:repeat(3,1fr);}
+    .offer-grid, .why-grid{grid-template-columns:repeat(2,1fr);}
+    .booking-layout{grid-template-columns:1fr;}
+    .summary-box{position:static;}
+  }
+  @media (max-width: 720px){
+    header{padding:14px 20px;}
+    nav.main-nav{display:none;}
+    section{padding:56px 20px;}
+    .category-grid{grid-template-columns:repeat(2,1fr);}
+    .hotel-grid{grid-template-columns:1fr;}
+    .dest-scroll{grid-template-columns:repeat(2,1fr);}
+    .offer-grid, .why-grid, .footer-grid{grid-template-columns:1fr 1fr;}
+    .search-bar{flex-direction:column; align-items:stretch;}
+    .gallery{grid-template-columns:1fr; height:auto;}
+    .gallery-main{height:260px;}
+    .gallery-side{grid-template-columns:1fr 1fr; grid-template-rows:1fr; height:120px;}
+    .confirm-card{padding:36px 22px;}
+    .confirm-actions{grid-template-columns:1fr;}
+    .booking-hero{padding:20px 20px 0;}
+    .booking-layout{padding:30px 20px 60px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     PAGE 1 — HOMEPAGE
+============================================================ -->
+<div class="view active" id="view-home">
+
+  <header>
+    <a class="logo" href="#" onclick="return false;">
+      <svg viewBox="0 0 40 40" fill="none">
+        <path class="wing" d="M6 22C6 22 10 10 20 9C22 9 21 12 18 13C24 12 30 15 32 20C25 17 22 19 22 19C28 20 31 25 30 29C27 24 20 22 17 23C21 25 22 29 20 32C19 27 14 24 10 24C13 26 13 29 11 31C10 27 7 25 6 22Z" fill="url(#birdgrad)"/>
+        <circle cx="19" cy="16" r="1.3" fill="#4A2E60"/>
+        <defs>
+          <linearGradient id="birdgrad" x1="6" y1="9" x2="32" y2="31" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#E8A33D"/>
+            <stop offset="45%" stop-color="#D4577C"/>
+            <stop offset="100%" stop-color="#6E5A9E"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      Nestaway
+    </a>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="#" class="current" onclick="return false;">Home</a></li>
+        <li><a href="#featured" onclick="return false;">Hotels</a></li>
+        <li><a href="#offers" onclick="return false;">Deals</a></li>
+        <li><a href="#why" onclick="return false;">About</a></li>
+        <li><a href="#footer" onclick="return false;">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="auth-btns">
+      <a class="btn-ghost" href="#" onclick="return false;">Log In</a>
+      <a class="btn-solid" href="#" onclick="return false;">Sign Up</a>
+    </div>
+  </header>
+
+  <section class="hero" style="padding:0;">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-content">
+      <h1>Find Your <span class="accent-word">Perfect</span> Stay</h1>
+      <p>Book hotels at the best prices worldwide.</p>
+
+      <div class="search-bar">
+        <div class="field">
+          <label>Destination</label>
+          <div class="input-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6E5A9E" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <input type="text" placeholder="Santorini, Greece" value="Santorini, Greece">
+          </div>
+        </div>
+        <div class="field">
+          <label>Check-in</label>
+          <div class="input-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6E5A9E" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <input type="date" value="2026-08-14">
+          </div>
+        </div>
+        <div class="field">
+          <label>Check-out</label>
+          <div class="input-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6E5A9E" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <input type="date" value="2026-08-19">
+          </div>
+        </div>
+        <div class="field">
+          <label>Guests</label>
+          <div class="input-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6E5A9E" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            <select><option>2 Adults, 1 Room</option><option>1 Adult</option><option>2 Adults, 2 Rooms</option><option>Family (4)</option></select>
+          </div>
+        </div>
+        <button class="btn-search" onclick="rippleEffect(event); switchView('booking');">Search</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="categories">
+    <div class="section-head reveal">
+      <span class="eyebrow">Explore by type</span>
+      <h2>Browse by Category</h2>
+      <p>From heritage havens to island escapes — find the stay that matches your journey.</p>
+    </div>
+    <div class="category-grid">
+      <!-- Category cards -->
+    </div>
+  </section>
+
+  <section id="featured" style="background:var(--cream); border-radius:48px; margin:0 20px; width:auto;">
+    <div class="section-head reveal">
+      <span class="eyebrow">Handpicked for you</span>
+      <h2>Featured Hotels</h2>
+      <p>Our editors' favorite stays this season, rated and reviewed by real travelers.</p>
+    </div>
+    <div class="hotel-grid" id="hotelGrid"></div>
+  </section>
+
+  <section id="destinations">
+    <div class="section-head reveal">
+      <span class="eyebrow">Where to next</span>
+      <h2>Popular Destinations</h2>
+      <p>The cities and coastlines our travelers can't stop booking.</p>
+    </div>
+    <div class="dest-scroll" id="destGrid"></div>
+  </section>
+
+  <section id="offers" style="background:var(--purple-tint); border-radius:48px; margin:0 20px; width:auto;">
+    <div class="section-head reveal">
+      <span class="eyebrow">Save more</span>
+      <h2>Special Offers</h2>
+      <p>Limited-time deals to make your next stay even better.</p>
+    </div>
+    <div class="offer-grid" id="offerGrid"></div>
+  </section>
+
+  <section id="why">
+    <div class="section-head reveal">
+      <span class="eyebrow">Peace of mind</span>
+      <h2>Why Choose Nestaway</h2>
+      <p>Booking with us means booking with confidence, every time.</p>
+    </div>
+    <div class="why-grid" id="whyGrid"></div>
+  </section>
+
+  <footer id="footer">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">
+          <svg width="26" height="26" viewBox="0 0 40 40" fill="none"><path d="M6 22C6 22 10 10 20 9C22 9 21 12 18 13C24 12 30 15 32 20C25 17 22 19 22 19C28 20 31 25 30 29C27 24 20 22 17 23C21 25 22 29 20 32C19 27 14 24 10 24C13 26 13 29 11 31C10 27 7 25 6 22Z" fill="#E8A33D"/></svg>
+          Nestaway
+        </div>
+        <p style="font-size:13px; opacity:0.75; max-width:260px; line-height:1.6;">Curated stays around the world, booked in minutes, backed by a team that actually answers the phone.</p>
+      </div>
+      <div>
+        <h5>Company</h5>
+        <ul><li><a href="#" onclick="return false;">About Us</a></li><li><a href="#" onclick="return false;">Careers</a></li><li><a href="#" onclick="return false;">Press</a></li></ul>
+      </div>
+      <div>
+        <h5>Support</h5>
+        <ul><li><a href="#" onclick="return false;">Contact Us</a></li><li><a href="#" onclick="return false;">FAQ</a></li><li><a href="#" onclick="return false;">Cancellation Policy</a></li></ul>
+      </div>
+      <div>
+        <h5>Legal</h5>
+        <ul><li><a href="#" onclick="return false;">Privacy Policy</a></li><li><a href="#" onclick="return false;">Terms & Conditions</a></li></ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Nestaway. All rights reserved.</span>
+      <div class="social-row">
+        <a href="#" onclick="return false;" aria-label="Facebook"><svg width="15" height="15" viewBox="0 0 24 24" fill="#fff"><path d="M13 22v-9h3l1-4h-4V6.5C13 5.5 13.5 5 14.7 5H17V1.4C16.6 1.3 15.2 1 13.6 1 10.3 1 8 3 8 6.6V9H5v4h3v9h5z"/></svg></a>
+        <a href="#" onclick="return false;" aria-label="Instagram"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+        <a href="#" onclick="return false;" aria-label="Twitter"><svg width="15" height="15" viewBox="0 0 24 24" fill="#fff"><path d="M23 4.9c-.8.4-1.7.7-2.6.8.9-.6 1.6-1.5 2-2.5-.9.5-1.9.9-2.9 1.1A4.5 4.5 0 0016 3c-2.5 0-4.5 2.1-4.5 4.6 0 .4 0 .7.1 1A12.8 12.8 0 013 4.2a4.6 4.6 0 001.4 6.1c-.7 0-1.4-.2-2-.6v.1c0 2.2 1.5 4 3.6 4.5-.6.2-1.3.2-1.9.1.5 1.8 2.2 3.1 4.1 3.1A9.1 9.1 0 012 19.5 12.8 12.8 0 008.9 21.5c8.3 0 12.8-7 12.8-13v-.6c.9-.6 1.6-1.4 2.3-2.3z"/></svg></a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ============================================================
+     PAGE 2 — BOOKING DETAILS
+============================================================ -->
+<div class="view" id="view-booking">
+  <header>
+    <a class="logo" href="#" onclick="switchView('home'); return false;">
+      <svg viewBox="0 0 40 40" fill="none"><path class="wing" d="M6 22C6 22 10 10 20 9C22 9 21 12 18 13C24 12 30 15 32 20C25 17 22 19 22 19C28 20 31 25 30 29C27 24 20 22 17 23C21 25 22 29 20 32C19 27 14 24 10 24C13 26 13 29 11 31C10 27 7 25 6 22Z" fill="url(#birdgrad2)"/><defs><linearGradient id="birdgrad2" x1="6" y1="9" x2="32" y2="31" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E8A33D"/><stop offset="45%" stop-color="#D4577C"/><stop offset="100%" stop-color="#6E5A9E"/></linearGradient></defs></svg>
+      Nestaway
+    </a>
+    <nav class="main-nav"><ul>
+      <li><a href="#" onclick="switchView('home'); return false;">Home</a></li>
+      <li><a href="#" class="current" onclick="return false;">Hotels</a></li>
+      <li><a href="#" onclick="return false;">Deals</a></li>
+      <li><a href="#" onclick="return false;">About</a></li>
+      <li><a href="#" onclick="return false;">Contact</a></li>
+    </ul></nav>
+    <div class="auth-btns">
+      <a class="btn-ghost" href="#" onclick="return false;">Log In</a>
+      <a class="btn-solid" href="#" onclick="return false;">Sign Up</a>
+    </div>
+  </header>
+
+  <div class="booking-hero">
+    <div class="breadcrumb"><a href="#" onclick="switchView('home'); return false;">Home</a> / Hotels / <b>Tropical Escape Resort</b></div>
+    <div class="gallery">
+      <div class="gallery-main">
+        <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1200&q=80" alt="Tropical Escape Resort main view">
+      </div>
+      <div class="gallery-side">
+        <div><img src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=700&q=80" alt="Resort pool"></div>
+        <div>
+          <img src="https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=700&q=80" alt="Resort room">
+          <div class="more-overlay">+12 photos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="booking-layout">
+    <div class="hotel-info-block">
+      <h1>Tropical Escape Resort</h1>
+      <div class="hotel-meta">
+        <div class="rating-pill">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2 1.2-6.8-5-4.9 6.9-1z"/></svg>
+          4.8 · 312 reviews
+        </div>
+        <div class="loc-line">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Nusa Dua, Bali, Indonesia
+        </div>
+      </div>
+      <p class="hotel-desc">A beachfront sanctuary of thatched-roof villas and infinity pools facing the Indian Ocean. Wake to the sound of waves, dine on open-air terraces, and unwind at the cliffside spa — all just twenty minutes from Ngurah Rai Airport.</p>
+
+      <div class="amenity-strip">
+        <div><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.5v6M5 12.5a3 3 0 013-3h8a3 3 0 013 3M5 12.5H3M19 12.5v6M19 12.5H21M7 9.5V7a2 2 0 012-2h6a2 2 0 012 2v2.5"/></svg>Free Wi-Fi</div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="8" r="3"/><path d="M2 21c1-4 5-6 10-6s9 2 10 6"/></svg>Beach Access</div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 12h20M4 12v6a1 1 0 001 1h14a1 1 0 001-1v-6M2 12l2-6h16l2 6"/></svg>Infinity Pool</div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="1" y="6" width="15" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3"/></svg>Free Parking</div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/></svg>Spa & Wellness</div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg>Breakfast</div>
+      </div>
+
+      <div class="form-card">
+        <h3>Guest Details</h3>
+        <div class="form-grid">
+          <div class="form-group"><label>Full Name</label><input type="text" placeholder="Enter your full name" value="Aditi Rao"></div>
+          <div class="form-group"><label>Email Address</label><input type="email" placeholder="you@example.com" value="aditi.rao@email.com"></div>
+          <div class="form-group"><label>Phone Number</label><input type="tel" placeholder="+91 00000 00000" value="+91 98765 43210"></div>
+          <div class="form-group"><label>Room Type</label>
+            <select><option>Deluxe Ocean Villa</option><option>Garden Suite</option><option>Family Bungalow</option></select>
+          </div>
+          <div class="form-group"><label>Check-in Date</label><input type="date" value="2026-08-14"></div>
+          <div class="form-group"><label>Check-out Date</label><input type="date" value="2026-08-19"></div>
+          <div class="form-group full"><label>Special Requests</label><input type="text" placeholder="e.g. late check-in, high floor, honeymoon setup"></div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3>Payment Method</h3>
+        <div class="payment-methods">
+          <div class="pay-opt selected" onclick="selectPay(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+            <span>Credit / Debit</span>
+          </div>
+          <div class="pay-opt" onclick="selectPay(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            <span>UPI</span>
+          </div>
+          <div class="pay-opt" onclick="selectPay(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            <span>Net Banking</span>
+          </div>
+          <div class="pay-opt" onclick="selectPay(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 2h9a5 5 0 010 10H9l-2 10H3L6 2z"/></svg>
+            <span>PayPal</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="summary-box">
+        <div class="summary-hotel">
+          <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=200&q=80" alt="">
+          <div>
+            <h4>Tropical Escape Resort</h4>
+            <p>Deluxe Ocean Villa · Bali</p>
+          </div>
+        </div>
+        <div class="summary-row"><span>5 nights × <b>$370</b></span><b>$1,850</b></div>
+        <div class="summary-row"><span>Taxes & fees</span><b>$142</b></div>
+        <div class="summary-row"><span>Early bird discount</span><b style="color:#3F9E67;">−$185</b></div>
+        <div class="summary-total"><span>Total</span><span>$1,807</span></div>
+        <button class="btn-confirm" onclick="rippleEffect(event); switchView('confirm');">Confirm Booking</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     PAGE 3 — ORDER CONFIRMATION
+============================================================ -->
+<div class="view" id="view-confirm">
+  <header>
+    <a class="logo" href="#" onclick="switchView('home'); return false;">
+      <svg viewBox="0 0 40 40" fill="none"><path class="wing" d="M6 22C6 22 10 10 20 9C22 9 21 12 18 13C24 12 30 15 32 20C25 17 22 19 22 19C28 20 31 25 30 29C27 24 20 22 17 23C21 25 22 29 20 32C19 27 14 24 10 24C13 26 13 29 11 31C10 27 7 25 6 22Z" fill="url(#birdgrad3)"/><defs><linearGradient id="birdgrad3" x1="6" y1="9" x2="32" y2="31" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E8A33D"/><stop offset="45%" stop-color="#D4577C"/><stop offset="100%" stop-color="#6E5A9E"/></linearGradient></defs></svg>
+      Nestaway
+    </a>
+    <nav class="main-nav"><ul>
+      <li><a href="#" onclick="switchView('home'); return false;">Home</a></li>
+      <li><a href="#" onclick="return false;">Hotels</a></li>
+      <li><a href="#" onclick="return false;">Deals</a></li>
+      <li><a href="#" onclick="return false;">About</a></li>
+      <li><a href="#" onclick="return false;">Contact</a></li>
+    </ul></nav>
+    <div class="auth-btns">
+      <a class="btn-ghost" href="#" onclick="return false;">Log In</a>
+      <a class="btn-solid" href="#" onclick="return false;">Sign Up</a>
+    </div>
+  </header>
+
+  <div class="confirm-wrap">
+    <div class="confirm-card">
+      <div class="check-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h1>Booking Confirmed!</h1>
+      <p class="sub">Thank you, Aditi! Your hotel has been successfully booked.</p>
+
+      <div class="confirm-details">
+        <div class="cd-row"><span>Booking ID</span><span>NW-2026-84731</span></div>
+        <div class="cd-row"><span>Hotel</span><span>Tropical Escape Resort</span></div>
+        <div class="cd-row"><span>Room Type</span><span>Deluxe Ocean Villa</span></div>
+        <div class="cd-row"><span>Guest Name</span><span>Aditi Rao</span></div>
+        <div class="cd-row"><span>Check-in</span><span>Aug 14, 2026</span></div>
+        <div class="cd-row"><span>Check-out</span><span>Aug 19, 2026</span></div>
+        <div class="cd-row"><span>Guests</span><span>2 Adults</span></div>
+        <div class="cd-row"><span>Estimated Check-in</span><span>2:00 PM</span></div>
+        <div class="cd-row"><span>Payment Status</span><span class="status-paid">Paid</span></div>
+        <div class="cd-row"><span>Total Amount Paid</span><span>$1,807.00</span></div>
+      </div>
+
+      <div class="confirm-actions">
+        <button class="conf-btn primary" onclick="return false;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+          Download Invoice
+        </button>
+        <button class="conf-btn outline" onclick="return false;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 6l8 6 8-6"/></svg>
+          Email Confirmation
+        </button>
+        <button class="conf-btn outline" onclick="return false;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          View Booking
+        </button>
+        <button class="conf-btn outline" onclick="switchView('home'); return false;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+          Back to Home
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Prototype navigator -->
+<div class="proto-switch">
+  <button class="active" data-v="home" onclick="switchView('home')">Homepage</button>
+  <button data-v="booking" onclick="switchView('booking')">Booking</button>
+  <button data-v="confirm" onclick="switchView('confirm')">Confirmation</button>
+</div>
+
+<script>
+/* ---------------- DATA ---------------- */
+const categories = [
+  ["Luxury Hotels","https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=500&q=70"],
+  ["Budget Hotels","https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=500&q=70"],
+  ["Boutique Hotels","https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=500&q=70"],
+  ["Resorts","https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=500&q=70"],
+  ["Business Hotels","https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=500&q=70"],
+  ["Heritage Hotels","https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=500&q=70"],
+  ["Airport Hotels","https://images.unsplash.com/photo-1445991842772-097fea258e7b?auto=format&fit=crop&w=500&q=70"],
+  ["Hostels","https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=500&q=70"],
+  ["Island Getaways","https://images.unsplash.com/photo-1573843981267-be1999ff37cd?auto=format&fit=crop&w=500&q=70"],
+  ["Spa & Wellness","https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=500&q=70"]
+];
+const catIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>';
+
+const hotels = [
+  ["Seaside Resort","Bali, Indonesia","https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=500&q=75","$370","Popular"],
+  ["Urban Skyline Hotel","Singapore","https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=500&q=75","$310","New"],
+  ["Mountain Hideaway","Aspen, USA","https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?auto=format&fit=crop&w=500&q=75","$270","Cozy"],
+  ["Tropical Escape","Maldives","https://images.unsplash.com/photo-1573052905904-34ad8c27f0cc?auto=format&fit=crop&w=500&q=75","$430","Top Rated"]
+];
+
+const destinations = [
+  ["Paris","https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=500&q=75"],
+  ["Dubai","https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=500&q=75"],
+  ["Bali","https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=75"],
+  ["Singapore","https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=500&q=75"],
+  ["Maldives","https://images.unsplash.com/photo-1590523278191-995cbcda646b?auto=format&fit=crop&w=500&q=75"]
+];
+
+const offers = [
+  ["20% Off Weekend Stay","Book Fri–Sun and save instantly on select properties.",'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6E5A9E" stroke-width="2"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>'],
+  ["Free Breakfast Included","Start every morning right, on the house, every stay.",'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B5751A" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg>'],
+  ["Early Bird Deals","Book 30 days ahead and unlock our lowest rates.",'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8C6A2F" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>'],
+  ["Family Packages","Extra beds, kids stay free, and rooms built for groups.",'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8B4A87" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>']
+];
+
+const whys = [
+  ["Best Price Guarantee","Find it cheaper elsewhere? We'll match it, no questions asked.",'<path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2 1.2-6.8-5-4.9 6.9-1z"/>'],
+  ["24/7 Customer Support","Real humans, day or night, ready whenever you need us.",'<path d="M3 12a9 9 0 0118 0v5a2 2 0 01-2 2h-1v-7h3M3 17v-5h3v7H5a2 2 0 01-2-2z"/>'],
+  ["Easy Cancellation","Plans change. Cancel most bookings free up to 24 hours ahead.",'<path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/>'],
+  ["Secure Booking","Bank-level encryption on every reservation, every time.",'<path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/>']
+];
+
+/* ---------------- BUILD DOM ---------------- */
+const catGrid = document.querySelector('.category-grid');
+categories.forEach(([name,img])=>{
+  catGrid.innerHTML += `<div class="cat-card"><img src="${img}" alt="${name}"><div class="cat-label">${catIcon}${name}</div></div>`;
+});
+
+const hotelGrid = document.getElementById('hotelGrid');
+hotels.forEach(([name,loc,img,price,tag])=>{
+  hotelGrid.innerHTML += `
+  <div class="hotel-card">
+    <div class="hotel-img-wrap">
+      <img src="${img}" alt="${name}">
+      <div class="hotel-tag">${tag}</div>
+    </div>
+    <div class="hotel-body">
+      <h3>${name}</h3>
+      <div class="hotel-loc">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        ${loc}
+      </div>
+      <div class="stars">
+        ${'<svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2 1.2-6.8-5-4.9 6.9-1z"/></svg>'.repeat(5)}
+      </div>
+      <div class="amenities">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M5 12.5v6M5 12.5a3 3 0 013-3h8a3 3 0 013 3M5 12.5H3M19 12.5v6M19 12.5H21M7 9.5V7a2 2 0 012-2h6a2 2 0 012 2v2.5"/></svg>Wi-Fi</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M2 12h20M4 12v6a1 1 0 001 1h14a1 1 0 001-1v-6M2 12l2-6h16l2 6"/></svg>Pool</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><rect x="1" y="6" width="15" height="12" rx="2"/><path d="M16 10l6-3v10l-6-3"/></svg>Parking</span>
+      </div>
+      <div class="hotel-foot">
+        <div class="price">${price}<span> / night</span></div>
+        <button class="btn-book" onclick="switchView('booking')">Book Now</button>
+      </div>
+    </div>
+  </div>`;
+});
+
+const destGrid = document.getElementById('destGrid');
+destinations.forEach(([name,img])=>{
+  destGrid.innerHTML += `<div class="dest-card"><img src="${img}" alt="${name}"><span>${name}</span></div>`;
+});
+
+const offerGrid = document.getElementById('offerGrid');
+offers.forEach(([title,desc,icon])=>{
+  offerGrid.innerHTML += `<div class="offer-card"><div class="offer-badge">${icon}</div><h4>${title}</h4><p>${desc}</p></div>`;
+});
+
+const whyGrid = document.getElementById('whyGrid');
+whys.forEach(([title,desc,path])=>{
+  whyGrid.innerHTML += `<div class="why-card"><div class="why-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2">${path}</svg></div><h4>${title}</h4><p>${desc}</p></div>`;
+});
+
+/* ---------------- VIEW SWITCHING ---------------- */
+function switchView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.proto-switch button').forEach(b=>b.classList.toggle('active', b.dataset.v===name));
+  window.scrollTo({top:0, behavior:'instant' in window ? 'instant':'auto'});
+  if(name==='home'){ initReveal(); }
+}
+
+/* ---------------- SCROLL REVEAL ---------------- */
+function initReveal(){
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el=>el.classList.remove('in'));
+  const els = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); } });
+  }, {threshold:0.15});
+  els.forEach(el=>obs.observe(el));
+}
+
+/* alternate slide directions for category & dest cards on scroll */
+window.addEventListener('DOMContentLoaded', ()=>{
+  document.querySelectorAll('.category-grid, .hotel-grid, .offer-grid, .why-grid').forEach(grid=>{
+    grid.classList.add('reveal');
+  });
+  document.querySelectorAll('.dest-scroll .dest-card').forEach((card,i)=>{
+    card.classList.add(i%2===0 ? 'reveal-left':'reveal-right');
+  });
+  initReveal();
+});
+
+/* ---------------- PARALLAX HERO ---------------- */
+const heroBg = document.getElementById('heroBg');
+window.addEventListener('scroll', ()=>{
+  if(document.getElementById('view-home').classList.contains('active')){
+    const y = window.scrollY;
+    heroBg.style.transform = `translateY(${y*0.28}px)`;
+  }
+});
+
+/* ---------------- PAYMENT SELECT ---------------- */
+function selectPay(el){
+  document.querySelectorAll('.pay-opt').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+/* ---------------- RIPPLE ---------------- */
+function rippleEffect(e){
+  const btn = e.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  const ripple = document.createElement('span');
+  const size = Math.max(rect.width, rect.height);
+  ripple.className = 'ripple';
+  ripple.style.width = ripple.style.height = size+'px';
+  ripple.style.left = (e.clientX - rect.left - size/2)+'px';
+  ripple.style.top = (e.clientY - rect.top - size/2)+'px';
+  btn.style.position = 'relative';
+  btn.appendChild(ripple);
+  setTimeout(()=>ripple.remove(), 650);
+}
+</script>
+</body>
+</html>
